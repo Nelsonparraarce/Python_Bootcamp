@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Digimon API</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		th, td {
+			text-align: left;
+			padding: 8px;
+			border: 1px solid black;
+		}
+
+		th {
+			background-color: #dddddd;
+		}
+
+		img {
+			max-width: 100px;
+			max-height: 100px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Digimon API</h1>
+
+	<div>
+		<label for="name-input">Buscar por nombre:</label>
+		<input type="text" id="name-input">
+		<button onclick="searchByName()">Buscar</button>
+	</div>
+
+	<div>
+		<label for="level-input">Buscar por nivel:</label>
+		<input type="text" id="level-input">
+		<button onclick="searchByLevel()">Buscar</button>
+	</div>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Nombre</th>
+				<th>Nivel</th>
+				<th>Imagen</th>
+			</tr>
+		</thead>
+		<tbody id="digimon-table">
+		</tbody>
+	</table>
+
+	<script>
+		let digimonData = [];
+
+		function renderTable(data) {
+			const digimonTable = document.getElementById('digimon-table');
+			digimonTable.innerHTML = '';
+
+			data.forEach(digimon => {
+				const row = document.createElement('tr');
+
+				const nameCell = document.createElement('td');
+				nameCell.textContent = digimon.name;
+
+				const levelCell = document.createElement('td');
+				levelCell.textContent = digimon.level;
+
+				const imageCell = document.createElement('td');
+				const image = document.createElement('img');
+				image.src = digimon.img;
+				image.alt = digimon.name;
+				imageCell.appendChild(image);
+
+				row.appendChild(nameCell);
+				row.appendChild(levelCell);
+				row.appendChild(imageCell);
+
+				digimonTable.appendChild(row);
+			});
+		}
+
+		function searchByName() {
+			const nameInput = document.getElementById('name-input');
+			const nameQuery = nameInput.value.toLowerCase().trim();
+
+			if (nameQuery === '') {
+				renderTable(digimonData);
+				return;
+			}
+
+			const filteredData = digimonData.filter(digimon => digimon.name.toLowerCase().includes(nameQuery));
+			renderTable(filteredData);
+		}
+
+		function searchByLevel() {
+			const levelInput = document.getElementById('level-input');
+			const levelQuery = levelInput.value.toLowerCase().trim();
+
+			if (levelQuery === '') {
+				renderTable(digimonData);
+				return;
+			}
+
+			const filteredData = digimonData.filter(digimon => digimon.level.toLowerCase().includes(levelQuery));
+			renderTable(filteredData);
+		}
+
+		fetch('https://digimon-api.vercel.app/api/digimon')
+			.then(response => response.json())
+			.then(data => {
+				digimonData = data;
+				renderTable(digimonData);
+			})
+			.catch(error => console.error(error));
+	</script>
+</body>
+</html>
+
